@@ -17,7 +17,7 @@ model User {
   id String @id @default(uuid())
   username String @unique
   email String @unique
-  passwordHash String
+  password String
   reviews Review[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -34,7 +34,7 @@ model Movie {
 model Review {
   id String @id @default(uuid())
   rating Int
-  text String?
+  text String? @db.Text
   userId String
   username String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

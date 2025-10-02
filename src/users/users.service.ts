@@ -17,6 +17,11 @@ export class UsersService {
     return salt ? salt : 10;
   }
 
+  async hashPassword(password: string): Promise<string> {
+    const hashedPassword = await bcrypt.hash(password, this.getSalt());
+    return hashedPassword;
+  }
+
   async getUserByUsername(username: string) {
     const user = await this.prisma.user.findUnique({
       where: { username: username },
@@ -31,8 +36,8 @@ export class UsersService {
 
   async createUser(createUserDto: CreateUserDto) {
     const { password } = createUserDto;
-    const passwordHashed: string = await bcrypt.hash(password, this.getSalt());
-    createUserDto.password = passwordHashed;
+
+    createUserDto.password = await this.hashPassword(password);
     const user = await this.prisma.user.create({
       data: createUserDto,
     });
@@ -42,11 +47,8 @@ export class UsersService {
 
   async updateUser(username: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
-      const passwordHashed: string = await bcrypt.hash(
-        updateUserDto.password,
-        this.getSalt(),
-      );
-      updateUserDto = { ...updateUserDto, password: passwordHashed };
+      const { password } = updateUserDto;
+      updateUserDto.password = await this.hashPassword(password);
     }
 
     const user = await this.prisma.user.update({

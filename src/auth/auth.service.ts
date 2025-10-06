@@ -85,7 +85,7 @@ export class AuthService {
       where: { token: refreshToken },
     });
 
-    if (!token || token.expiresIn > new Date()) {
+    if (!token || token.expiresIn < new Date()) {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
@@ -120,11 +120,11 @@ export class AuthService {
   }
 
   async logout(refreshToken: string) {
-    const deleted = await this.prisma.token.delete({
+    const { count } = await this.prisma.token.deleteMany({
       where: { token: refreshToken },
     });
 
-    if (!deleted) {
+    if (count === 0) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }

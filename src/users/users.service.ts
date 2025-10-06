@@ -18,7 +18,8 @@ export class UsersService {
   }
 
   async hashPassword(password: string): Promise<string> {
-    const hashedPassword = await bcrypt.hash(password, this.getSalt());
+    const salt = Number(this.getSalt());
+    const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
   }
 

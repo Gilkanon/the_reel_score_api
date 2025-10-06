@@ -13,14 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER 
+  ADMIN
+}
+
 model User {
   id String @id @default(uuid())
   username String @unique
   email String @unique
   password String
+  role Role @default(USER)
+  tokens Token[]
   reviews Review[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Token {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  expiresIn DateTime
+  token String @unique
 }
 
 model Movie {

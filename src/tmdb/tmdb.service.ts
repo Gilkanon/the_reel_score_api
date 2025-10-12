@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import {
@@ -13,6 +13,7 @@ import {
 import { plainToInstance } from 'class-transformer';
 import SearchResultDto from './dto/search-movie.dto';
 import { AxiosRequestConfig } from 'axios';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class TmdbService {
@@ -35,6 +36,21 @@ export class TmdbService {
         Authorization: `Bearer ${this.accessToken}`,
       },
     };
+  }
+
+  private async handleRequest<T>(requestFn: () => Promise<T>): Promise<T> {
+    try {
+      return await requestFn();
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw error;
+      }
+
+      console.error('Unexpected runtime error in TMDbService:', error);
+      throw new InternalServerErrorException(
+        'Internal error processing data from external API.',
+      );
+    }
   }
 
   private async fetchAndTransformPaginated<TSource, TDestination>(
@@ -74,20 +90,24 @@ export class TmdbService {
   async getMovieDetailsById(movieId: number): Promise<MovieDetails> {
     const url = this.buildUrl(`/movie/${movieId}`);
 
-    const { data } = await firstValueFrom(
-      this.httpService.get<MovieDetails>(url, this.requestOptions),
-    );
-    return data;
+    return this.handleRequest(async () => {
+      const { data } = await firstValueFrom(
+        this.httpService.get<MovieDetails>(url, this.requestOptions),
+      );
+      return data;
+    });
   }
 
   async getMovieCredits(movieId: number): Promise<Credits> {
     const url = this.buildUrl(`/movie/${movieId}/credits`);
 
-    const { data } = await firstValueFrom(
-      this.httpService.get<Credits>(url, this.requestOptions),
-    );
+    return this.handleRequest(async () => {
+      const { data } = await firstValueFrom(
+        this.httpService.get<Credits>(url, this.requestOptions),
+      );
 
-    return data;
+      return data;
+    });
   }
 
   async searchMovies(
@@ -100,39 +120,47 @@ export class TmdbService {
       page: page,
     });
 
-    return this.fetchAndTransformPaginated<Movie, SearchResultDto>(
-      url,
-      SearchResultDto,
-    );
+    return this.handleRequest(async () => {
+      return this.fetchAndTransformPaginated<Movie, SearchResultDto>(
+        url,
+        SearchResultDto,
+      );
+    });
   }
 
   async getTrendingMovies(): Promise<ApiResponse<SearchResultDto>> {
     const url = this.buildUrl('/trending/movie/day');
 
-    return this.fetchAndTransformPaginated<Movie, SearchResultDto>(
-      url,
-      SearchResultDto,
-    );
+    return this.handleRequest(async () => {
+      return this.fetchAndTransformPaginated<Movie, SearchResultDto>(
+        url,
+        SearchResultDto,
+      );
+    });
   }
 
   async getTvShowDetailsById(tvShowId: number): Promise<TvShowDetails> {
     const url = this.buildUrl(`/tv/${tvShowId}`);
 
-    const { data } = await firstValueFrom(
-      this.httpService.get<TvShowDetails>(url, this.requestOptions),
-    );
+    return this.handleRequest(async () => {
+      const { data } = await firstValueFrom(
+        this.httpService.get<TvShowDetails>(url, this.requestOptions),
+      );
 
-    return data;
+      return data;
+    });
   }
 
   async getTvShowCredits(tvShowId: number): Promise<Credits> {
     const url = this.buildUrl(`/tv/${tvShowId}/credits`);
 
-    const { data } = await firstValueFrom(
-      this.httpService.get<Credits>(url, this.requestOptions),
-    );
+    return this.handleRequest(async () => {
+      const { data } = await firstValueFrom(
+        this.httpService.get<Credits>(url, this.requestOptions),
+      );
 
-    return data;
+      return data;
+    });
   }
 
   async searchTvShows(
@@ -145,18 +173,22 @@ export class TmdbService {
       page: page,
     });
 
-    return this.fetchAndTransformPaginated<TvShow, SearchResultDto>(
-      url,
-      SearchResultDto,
-    );
+    return this.handleRequest(async () => {
+      return this.fetchAndTransformPaginated<TvShow, SearchResultDto>(
+        url,
+        SearchResultDto,
+      );
+    });
   }
 
   async getTrendingTvShows(): Promise<ApiResponse<SearchResultDto>> {
     const url = this.buildUrl('/trending/tv/day');
 
-    return this.fetchAndTransformPaginated<TvShow, SearchResultDto>(
-      url,
-      SearchResultDto,
-    );
+    return this.handleRequest(async () => {
+      return this.fetchAndTransformPaginated<TvShow, SearchResultDto>(
+        url,
+        SearchResultDto,
+      );
+    });
   }
 }

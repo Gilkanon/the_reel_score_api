@@ -25,13 +25,6 @@ export interface TvShow extends MediaListItem {
   name: string;
 }
 
-export interface ApiResponse<T> {
-  page: number;
-  results: T[];
-  total_pages: number;
-  total_results: number;
-}
-
 interface Genre {
   id: number;
   name: string;

@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { TmdbService } from './tmdb.service';
 import {
-  ApiResponse,
   Credits,
   MovieDetails,
   TvShowDetails,
 } from './interfaces/tmdb.interfaces';
 import SearchResultDto from './dto/search-movie.dto';
+import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 
 @Controller('tmdb')
 export class TmdbController {

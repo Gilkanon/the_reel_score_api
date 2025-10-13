@@ -3,7 +3,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 import {
-  ApiResponse,
   Credits,
   Movie,
   MovieDetails,
@@ -14,6 +13,7 @@ import { plainToInstance } from 'class-transformer';
 import SearchResultDto from './dto/search-movie.dto';
 import { AxiosRequestConfig } from 'axios';
 import { AxiosError } from 'axios';
+import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 
 @Injectable()
 export class TmdbService {

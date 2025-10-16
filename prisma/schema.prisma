@@ -18,6 +18,11 @@ enum Role {
   ADMIN
 }
 
+enum MediaType {
+  Movie
+  TV
+}
+
 model User {
   id String @id @default(uuid())
   username String @unique
@@ -26,35 +31,44 @@ model User {
   role Role @default(USER)
   tokens Token[]
   reviews Review[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
 }
 
 model Token {
   id String @id @default(uuid())
-  userId String
+  userId String @map("user_id")
   user User @relation(fields: [userId], references: [id])
-  expiresIn DateTime
+  expiresIn DateTime @map("expires_in")
   token String @unique
+
+  @@map("tokens")
 }
 
-model Movie {
+model Media {
   id Int @id
+  type MediaType
   title String
-  releaseYear Int
-  posterUrl String
+  releaseDate String @map("release_date")
+  posterPath String? @map("poster_path")
   reviews Review[]
+
+  @@map("medias")
 }
 
 model Review {
   id String @id @default(uuid())
   rating Int
   text String? @db.Text
-  userId String
+  userId String @map("user_id")
   username String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  movieId Int
-  movie Movie @relation(fields: [movieId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  mediaId Int @map("media_id")
+  media Media @relation(fields: [mediaId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("reviews")
 }

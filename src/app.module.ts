@@ -4,6 +4,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { TmdbModule } from './tmdb/tmdb.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { TmdbModule } from './tmdb/tmdb.module';
     UsersModule,
     AuthModule,
     TmdbModule,
+    ReviewsModule,
   ],
   controllers: [],
   providers: [],

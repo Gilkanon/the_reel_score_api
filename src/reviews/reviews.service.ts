@@ -149,7 +149,7 @@ export class ReviewsService {
 
       let mediaData: MovieDetails | TvShowDetails;
 
-      if (mediaType === 'Movie') {
+      if (mediaType === MediaType.Movie) {
         mediaData = await this.tmdbService.getMovieDetailsById(mediaId);
       } else {
         mediaData = await this.tmdbService.getTvShowDetailsById(mediaId);
@@ -213,7 +213,7 @@ export class ReviewsService {
   async deleteReview(user: Payload, reviewId: string): Promise<void> {
     return this.handleError<void>(async () => {
       await this.authorizeAndExecute(user, reviewId, (where) =>
-        this.prisma.review.deleteMany({ where }),
+        this.prisma.review.deleteMany({ where: where }),
       );
     });
   }

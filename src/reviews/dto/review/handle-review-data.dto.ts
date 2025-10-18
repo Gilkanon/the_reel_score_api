@@ -24,10 +24,6 @@ export class HandleReviewDataDto {
   text?: string;
 
   @IsNotEmpty()
-  @IsUUID()
-  userId: string;
-
-  @IsNotEmpty()
   @IsEnum(() => MediaType)
   mediaType: MediaType;
 

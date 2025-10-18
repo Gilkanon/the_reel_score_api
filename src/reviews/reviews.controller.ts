@@ -58,6 +58,6 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   async deleteReview(@Req() req, @Param('id') id: string): Promise<void> {
-    await this.reviewsService.deleteReview(req, id);
+    await this.reviewsService.deleteReview(req.user, id);
   }
 }

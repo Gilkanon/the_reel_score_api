@@ -12,7 +12,7 @@ import { ReviewsService } from './reviews.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdateReviewDto } from './dto/review/update-review.dto';
 import { plainToInstance } from 'class-transformer';
-import { ReviewDto } from './dto/review/review.dto';
+import { ReviewDto } from '../common/dto/review.dto';
 import { MediaDto } from './dto/media/media.dto';
 import { PostReviewDto } from './dto/post-review.dto';
 import { CreateReviewDto } from './dto/review/create-review.dto';

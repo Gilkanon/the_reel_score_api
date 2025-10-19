@@ -11,7 +11,7 @@ import {
   Credits,
   MovieDetails,
   TvShowDetails,
-} from './interfaces/tmdb.interfaces';
+} from '../common/interfaces/tmdb.interfaces';
 import SearchResultDto from './dto/search-movie.dto';
 import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 
@@ -19,41 +19,40 @@ import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 export class TmdbController {
   constructor(private readonly tmdbService: TmdbService) {}
 
-  //Move to media controller later
-  @Get('/movie/trending')
-  async getTrendingMovies(): Promise<ApiResponse<SearchResultDto>> {
-    const movies = await this.tmdbService.getTrendingMovies();
+  // All commented functions are currently in other controllers
+  // @Get('/movie/trending')
+  // async getTrendingMovies(): Promise<ApiResponse<SearchResultDto>> {
+  //   const movies = await this.tmdbService.getTrendingMovies();
 
-    return movies;
-  }
+  //   return movies;
+  // }
 
-  //Move to media controller later
-  @Get('/tv/trending')
-  async getTrendingTvShows(): Promise<ApiResponse<SearchResultDto>> {
-    const tvShows = await this.tmdbService.getTrendingTvShows();
+  // @Get('/tv/trending')
+  // async getTrendingTvShows(): Promise<ApiResponse<SearchResultDto>> {
+  //   const tvShows = await this.tmdbService.getTrendingTvShows();
 
-    return tvShows;
-  }
+  //   return tvShows;
+  // }
 
-  @Get('/movie/:id')
-  async getMovieById(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<MovieDetails> {
-    try {
-      const movieData = await this.tmdbService.getMovieDetailsById(id);
-      return movieData;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
+  // @Get('/movie/:id')
+  // async getMovieById(
+  //   @Param('id', ParseIntPipe) id: number,
+  // ): Promise<MovieDetails> {
+  //   try {
+  //     const movieData = await this.tmdbService.getMovieDetailsById(id);
+  //     return movieData;
+  //   } catch (error) {
+  //     throw new Error(error);
+  //   }
+  // }
 
-  @Get('/tv/:id')
-  async getTvShowById(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<TvShowDetails> {
-    const tvShowData = await this.tmdbService.getTvShowDetailsById(id);
-    return tvShowData;
-  }
+  // @Get('/tv/:id')
+  // async getTvShowById(
+  //   @Param('id', ParseIntPipe) id: number,
+  // ): Promise<TvShowDetails> {
+  //   const tvShowData = await this.tmdbService.getTvShowDetailsById(id);
+  //   return tvShowData;
+  // }
 
   @Get('/movie/:id/credits')
   async getMovieCredits(
@@ -71,20 +70,19 @@ export class TmdbController {
     return tvShowCredits;
   }
 
-  //Move to media controller later
-  @Get('/search')
-  async search(
-    @Query('query') query: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-  ) {
-    const [movieResults, tvShowsResult] = await Promise.all([
-      this.tmdbService.searchMovies(query, page),
-      this.tmdbService.searchTvShows(query, page),
-    ]);
+  // @Get('/search')
+  // async search(
+  //   @Query('query') query: string,
+  //   @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+  // ) {
+  //   const [movieResults, tvShowsResult] = await Promise.all([
+  //     this.tmdbService.searchMovies(query, page),
+  //     this.tmdbService.searchTvShows(query, page),
+  //   ]);
 
-    return {
-      movies: movieResults,
-      tvShows: tvShowsResult,
-    };
-  }
+  //   return {
+  //     movies: movieResults,
+  //     tvShows: tvShowsResult,
+  //   };
+  // }
 }

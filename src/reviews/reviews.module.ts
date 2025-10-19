@@ -9,5 +9,6 @@ import { UsersModule } from 'src/users/users.module';
   controllers: [ReviewsController],
   providers: [ReviewsService],
   imports: [PrismaModule, TmdbModule, UsersModule],
+  exports: [ReviewsService],
 })
 export class ReviewsModule {}

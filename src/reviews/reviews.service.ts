@@ -16,13 +16,14 @@ import { CreateReviewDto } from './dto/review/create-review.dto';
 import {
   MovieDetails,
   TvShowDetails,
-} from 'src/tmdb/interfaces/tmdb.interfaces';
+} from 'src/common/interfaces/tmdb.interfaces';
 import { UpdateReviewDto } from './dto/review/update-review.dto';
 import { Prisma } from '@prisma/client';
 import { Payload } from 'src/common/interfaces/payload.interface';
 import { PostReviewDto } from './dto/post-review.dto';
-import { ReviewDto } from './dto/review/review.dto';
+import { ReviewDto } from '../common/dto/review.dto';
 import { HandleReviewDataDto } from './dto/review/handle-review-data.dto';
+import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 
 @Injectable()
 export class ReviewsService {
@@ -80,8 +81,8 @@ export class ReviewsService {
   private async findReviews(
     where: object,
     paginationDto: PaginationDto,
-  ): Promise<{ data: Review[]; total: number }> {
-    return this.handleError<{ data: Review[]; total: number }>(async () => {
+  ): Promise<ApiResponse<ReviewDto>> {
+    return this.handleError<ApiResponse<ReviewDto>>(async () => {
       const { page, limit } = paginationDto;
       const { take, skip } = getPaginationParams(page, limit);
 
@@ -94,7 +95,12 @@ export class ReviewsService {
         this.prisma.review.count({ where }),
       ]);
 
-      return { data, total };
+      return {
+        page: page ? page : 1,
+        results: data,
+        total_pages: total / take,
+        total_results: total,
+      };
     });
   }
 
@@ -126,14 +132,14 @@ export class ReviewsService {
   async getReviewsByMediaId(
     mediaId: number,
     paginationDto: PaginationDto,
-  ): Promise<{ data: Review[]; total: number }> {
+  ): Promise<ApiResponse<ReviewDto>> {
     return this.findReviews({ mediaId }, paginationDto);
   }
 
-  async getReviewsByUserId(
+  async getReviewsByUsername(
     username: string,
     paginationDto: PaginationDto,
-  ): Promise<{ data: Review[]; total: number }> {
+  ): Promise<ApiResponse<ReviewDto>> {
     return this.findReviews({ username }, paginationDto);
   }
 

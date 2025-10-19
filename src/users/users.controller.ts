@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -16,18 +17,37 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import UpdateUserDto from './dto/update-user.dto';
+import { ReviewsService } from 'src/reviews/reviews.service';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ReviewDto } from 'src/common/dto/review.dto';
+import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly reviewsService: ReviewsService,
+  ) {}
 
   @Get('/:username')
   async getUserByUsername(
     @Param('username') username: string,
-  ): Promise<UserDto> {
-    const user = await this.usersService.getUserByUsername(username);
+    @Query() paginationDto: PaginationDto,
+  ): Promise<{ user: UserDto; reviews: ApiResponse<ReviewDto> }> {
+    const [user, reviews] = await Promise.all([
+      this.usersService.getUserByUsername(username),
+      this.reviewsService.getReviewsByUsername(username, paginationDto),
+    ]);
 
-    return plainToInstance(UserDto, user);
+    return {
+      user: plainToInstance(UserDto, user),
+      reviews: {
+        ...reviews,
+        results: reviews.results.map((review) =>
+          plainToInstance(ReviewDto, review),
+        ),
+      },
+    };
   }
 
   @UseGuards(JwtAuthGuard)

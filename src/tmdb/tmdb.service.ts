@@ -8,7 +8,7 @@ import {
   MovieDetails,
   TvShow,
   TvShowDetails,
-} from './interfaces/tmdb.interfaces';
+} from '../common/interfaces/tmdb.interfaces';
 import { plainToInstance } from 'class-transformer';
 import SearchResultDto from './dto/search-movie.dto';
 import { AxiosRequestConfig } from 'axios';

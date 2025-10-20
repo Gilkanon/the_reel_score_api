@@ -1,98 +1,134 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🍿 The Reel Score
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+"The Reel Score" is a full-stack web application designed for browsing, rating, and reviewing movies and TV shows. This repository contains the complete **backend** for the application, built with NestJS.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project is being developed as a comprehensive learning exercise to master full-stack development, focusing on modern technologies, clean architecture, and best practices like the BFF (Backend for Frontend) pattern.
 
-## Description
+## ✨ Core Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **JWT Authentication:** Secure user registration and login using JWT (Access & Refresh tokens) with `passport.js`.
+- **Role-Based Access Control:** Differentiates between regular `USER` and `ADMIN` roles, with secure authorization checks at the service layer.
+- **BFF (Backend for Frontend) Endpoints:** A set of optimized endpoints designed to match specific UI views, aggregating data from multiple services into a single request.
+- **TMDb API Integration:** A dedicated service module to safely interact with The Movie Database (TMDb) API, acting as a secure proxy to protect the API key.
+- **Review Management:** Full CRUD functionality for user reviews (`create`, `update`, `delete`).
+- **Advanced Authorization:** Update/Delete logic is secured with an efficient check that validates either review ownership or admin privileges.
+- **Error Handling:** Implemented a robust, centralized error-handling strategy using global filters and service-level wrappers to handle `HttpException` and `Prisma` errors gracefully.
 
-## Project setup
+## 🛠 Tech Stack
 
-```bash
-$ yarn install
-```
+- **Framework:** [NestJS](https://nestjs.com/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **ORM:** [Prisma](https://www.prisma.io/)
+- **Database:** [MySQL](https://www.mysql.com/)
+- **Authentication:** [Passport.js](http://www.passportjs.org/) (with `passport-jwt`)
+- **Validation:** [class-validator](https://github.com/typestack/class-validator) & [class-transformer](https://github.com/typestack/class-transformer)
 
-## Compile and run the project
+## 🚀 API Endpoints
 
-```bash
-# development
-$ yarn run start
+This API is built using a hybrid BFF and RESTful approach.
 
-# watch mode
-$ yarn run start:dev
+### 🔐 Auth (`/auth`)
 
-# production mode
-$ yarn run start:prod
-```
+| Method | Endpoint    | Description                                      |
+| :----- | :---------- | :----------------------------------------------- |
+| `POST` | `/register` | Registers a new user.                            |
+| `POST` | `/login`    | Logs in a user and returns JWT tokens.           |
+| `POST` | `/logout`   | (Implementation TBD) Invalidates refresh token.  |
+| `POST` | `/refresh`  | Issues a new access token using a refresh token. |
 
-## Run tests
+### 👤 Users (`/users`)
 
-```bash
-# unit tests
-$ yarn run test
+| Method   | Endpoint     | Description                                             |
+| :------- | :----------- | :------------------------------------------------------ |
+| `GET`    | `/:username` | **(BFF)** Gets a user's profile info and their reviews. |
+| `PATCH`  | `/me`        | Updates the authenticated user's own profile.           |
+| `DELETE` | `/me`        | Deletes the authenticated user's own profile.           |
+| `PATCH`  | `/:username` | Updates the user's profile by administrator.            |
+| `DELETE` | `/:username` | Deletes the user's profile by administrator.            |
 
-# e2e tests
-$ yarn run test:e2e
+### ✍️ Reviews (`/reviews`)
 
-# test coverage
-$ yarn run test:cov
-```
+| Method   | Endpoint | Description                                       |
+| :------- | :------- | :------------------------------------------------ |
+| `POST`   | `/`      | Creates a new review for a movie or TV show.      |
+| `PATCH`  | `/:id`   | Updates an existing review (owner or admin only). |
+| `DELETE` | `/:id`   | Deletes an existing review (owner or admin only). |
 
-## Deployment
+### 🎬 Media & View Endpoints
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+| Method | Endpoint          | Description                                                                    |
+| :----- | :---------------- | :----------------------------------------------------------------------------- |
+| `GET`  | `/media/trending` | **(BFF)** Gets trending movies and TV shows for the home page.                 |
+| `GET`  | `/media/search`   | **(BFF)** Searches for movies and TV shows simultaneously.                     |
+| `GET`  | `/movies/:id`     | **(BFF)** Gets full movie details (from TMDb) and its reviews (from our DB).   |
+| `GET`  | `/tv/:id`         | **(BFF)** Gets full TV show details (from TMDb) and its reviews (from our DB). |
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### ⚙️ Tmdb (`/tmdb`)
 
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
-```
+| Method | Endpoint             | Description                         |
+| :----- | :------------------- | :---------------------------------- |
+| `GET`  | `/movie/:id/credits` | Gets movie credits from TMDb api.   |
+| `GET`  | `/tv/:id/credits`    | Gets TV show credits from TMDb api. |
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 📦 Getting Started
 
-## Resources
+### 1. Prerequisites
 
-Check out a few resources that may come in handy when working with NestJS:
+- Node.js (v18 or higher recommended)
+- npm or yarn
+- A running MySQL database
+- A TMDb API Key (get one [here](https://www.themoviedb.org/documentation/api))
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 2. Installation & Setup
 
-## Support
+1.  **Clone the repository:**
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+    ```bash
+    git clone [https://github.com/YOUR_USERNAME/the-reel-score.git](https://github.com/YOUR_USERNAME/the-reel-score.git)
+    cd the-reel-score
+    ```
 
-## Stay in touch
+2.  **Install dependencies:**
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+    ```bash
+    npm install
+    ```
 
-## License
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of the project and add the following variables:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+    ```env
+    # Database
+    DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
+
+    # JWT
+    JWT_SECRET="your-strong-access-secret"
+
+    # TMDb API
+    API_ACCESS_TOKEN="your-tmdb-v4-access-token"
+    TMDB_BASE_URL="[https://api.themoviedb.org/3](https://api.themoviedb.org/3)"
+
+    # Bcrypt
+    SALT="salt-rounds"
+    ```
+
+4.  **Run database migrations:**
+    This will sync your Prisma schema with your MySQL database.
+
+    ```bash
+    npx prisma migrate dev
+    ```
+
+5.  **Start the development server:**
+    ```bash
+    npm run start:dev
+    ```
+    The server will be running on `http://localhost:3000`.
+
+## 📈 Future Plans
+
+- [ ] **Testing:** Implement a robust testing strategy with:
+  - **Unit Tests (Jest)** for critical business logic (services).
+  - **E2E Tests (Jest & Supertest)** for API endpoints.
+- [ ] **CI/CD:** Set up a GitHub Actions workflow to run tests and builds automatically.
+- [ ] **Frontend Development:** Build the client-side application using **Next.js**, **TypeScript**, and **Tailwind CSS**.

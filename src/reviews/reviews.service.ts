@@ -98,7 +98,7 @@ export class ReviewsService {
       return {
         page: page ? page : 1,
         results: data,
-        total_pages: total / take,
+        total_pages: Math.max(1, Math.ceil(total / take)),
         total_results: total,
       };
     });

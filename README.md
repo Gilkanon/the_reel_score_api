@@ -169,7 +169,7 @@ Note: Please ensure your database container or service is running before executi
 
 ## 📈 Future Plans
 
-- [✓] **Testing:** Implement a robust testing strategy with:
+- [x] **Testing:** Implement a robust testing strategy with:
   - **Unit Tests (Jest)** for critical business logic (services).
   - **E2E Tests (Playwright)** for API endpoints.
 - [ ] **CI/CD:** Set up a GitHub Actions workflow to run tests and builds automatically.

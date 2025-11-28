@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   HttpException,
   Injectable,
@@ -44,6 +45,11 @@ export class ReviewsService {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
           throw new NotFoundException('The requested record was not found.');
+        }
+        if (error.code === 'P2002') {
+          throw new BadRequestException(
+            'A review for this media already exists. You can only create one review per media item.',
+          );
         }
       }
 

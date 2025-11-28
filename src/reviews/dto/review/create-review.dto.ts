@@ -28,6 +28,7 @@ export class CreateReviewDto {
   @IsNotEmpty()
   @IsNumber()
   mediaId: number;
+
   @IsNotEmpty()
   @IsString()
   username: string;

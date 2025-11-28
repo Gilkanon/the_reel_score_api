@@ -5,14 +5,15 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
   Max,
   MaxLength,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class HandleReviewDataDto {
   @IsNotEmpty()
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   @Max(5)
@@ -24,10 +25,13 @@ export class HandleReviewDataDto {
   text?: string;
 
   @IsNotEmpty()
-  @IsEnum(() => MediaType)
+  @IsEnum(MediaType, {
+    message: 'mediaType must be either Movie or TV',
+  })
   mediaType: MediaType;
 
   @IsNotEmpty()
+  @Type(() => Number)
   @IsNumber()
   mediaId: number;
 }

@@ -56,13 +56,19 @@ export class UsersService {
       where: { username: username },
       data: updateUserDto,
     });
+
+    return user;
   }
 
   async deleteUser(username: string) {
-    const user = await this.prisma.user.delete({
+    const { count } = await this.prisma.user.deleteMany({
       where: { username: username },
     });
 
-    return { message: `User with username ${user.username} has been deleted` };
+    if (count === 0) {
+      throw new NotFoundException('User with such username is not found');
+    }
+
+    return { message: `User has been deleted` };
   }
 }

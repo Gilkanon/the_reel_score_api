@@ -84,7 +84,7 @@ This API is built using a hybrid BFF and RESTful approach.
 1.  **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/the-reel-score.git](https://github.com/YOUR_USERNAME/the-reel-score.git)
+    git clone https://github.com/Gilkanon/the_reel_score_api.git
     cd the-reel-score
     ```
 
@@ -125,10 +125,52 @@ This API is built using a hybrid BFF and RESTful approach.
     ```
     The server will be running on `http://localhost:3000`.
 
+## 🧪 Testing
+
+This project follows a rigorous testing strategy to ensure reliability and correctness. We use **Jest** for unit testing and **Playwright** for End-to-End (E2E) integration testing.
+P.S. Mostly e2e tests were done with AI (cursor)
+
+### Tools
+
+- **Jest**: Used for unit tests to verify individual services and business logic in isolation.
+- **Playwright**: Used for E2E tests to verify full API workflows, database interactions, and HTTP responses.
+
+### Running Unit Tests
+
+To execute the unit tests suite:
+
+```bash
+yarn test
+```
+
+### Running E2E Tests
+
+End-to-End tests interact with the actual database. To ensure a clean and consistent testing environment, we have created a unified command that handles the database lifecycle automatically.
+
+To run E2E tests:
+
+```bash
+yarn test:e2e
+```
+
+### How it works
+
+The `test:e2e` command performs the following steps strictly in order:
+
+1. Seed (`prisma db seed`): Populates the database with necessary initial data required for the tests to pass.
+
+2. Test (`playwright test`): Executes the Playwright test scenarios against the running application.
+
+3. Cleanup (`prisma migrate reset`): Forcefully resets the database schema and wipes all data. This ensures that the database is left clean and no test artifacts remain after execution.
+
+4. Report (playwright show-report): Automatically launches the interactive HTML report in your browser to inspect detailed test results, logs, and traces.
+
+Note: Please ensure your database container or service is running before executing the tests.
+
 ## 📈 Future Plans
 
-- [ ] **Testing:** Implement a robust testing strategy with:
+- [✓] **Testing:** Implement a robust testing strategy with:
   - **Unit Tests (Jest)** for critical business logic (services).
-  - **E2E Tests (Jest & Supertest)** for API endpoints.
+  - **E2E Tests (Playwright)** for API endpoints.
 - [ ] **CI/CD:** Set up a GitHub Actions workflow to run tests and builds automatically.
 - [ ] **Frontend Development:** Build the client-side application using **Next.js**, **TypeScript**, and **Tailwind CSS**.

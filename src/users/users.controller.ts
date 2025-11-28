@@ -72,7 +72,7 @@ export class UsersController {
   @Roles(Role.ADMIN)
   @Patch('/:username')
   async updateUserData(
-    @Param() username: string,
+    @Param('username') username: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const user = await this.usersService.updateUser(username, updateUserDto);
@@ -83,7 +83,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Delete('/:username')
-  async deleteUserProfile(@Param() username: string) {
+  async deleteUserProfile(@Param('username') username: string) {
     return this.usersService.deleteUser(username);
   }
 }

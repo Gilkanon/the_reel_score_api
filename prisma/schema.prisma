@@ -14,7 +14,7 @@ datasource db {
 }
 
 enum Role {
-  USER 
+  USER
   ADMIN
 }
 
@@ -24,13 +24,13 @@ enum MediaType {
 }
 
 model User {
-  id String @id @default(uuid())
-  username String @unique
-  email String @unique
-  password String
-  role Role @default(USER)
-  tokens Token[]
-  reviews Review[]
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  tokens    Token[]
+  reviews   Review[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -38,37 +38,38 @@ model User {
 }
 
 model Token {
-  id String @id @default(uuid())
-  userId String @map("user_id")
-  user User @relation(fields: [userId], references: [id])
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresIn DateTime @map("expires_in")
-  token String @unique
+  token     String   @unique
 
   @@map("tokens")
 }
 
 model Media {
-  id Int @id
-  type MediaType
-  title String
-  releaseDate String @map("release_date")
-  posterPath String? @map("poster_path")
-  reviews Review[]
+  id          Int       @id
+  type        MediaType
+  title       String
+  releaseDate String    @map("release_date")
+  posterPath  String?   @map("poster_path")
+  reviews     Review[]
 
   @@map("medias")
 }
 
 model Review {
-  id String @id @default(uuid())
-  rating Int
-  text String? @db.Text
-  userId String @map("user_id")
-  username String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  mediaId Int @map("media_id")
-  media Media @relation(fields: [mediaId], references: [id])
+  id        String   @id @default(uuid())
+  rating    Int
+  text      String?  @db.Text
+  userId    String   @map("user_id")
+  username  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mediaId   Int      @map("media_id")
+  media     Media    @relation(fields: [mediaId], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@unique([userId, mediaId], name: "reviews_user_id_media_id_key")
   @@map("reviews")
 }

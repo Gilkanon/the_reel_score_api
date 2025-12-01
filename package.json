@@ -20,7 +20,9 @@
     "test:e2e": "yarn prisma db seed; yarn playwright test; yarn prisma migrate reset --force --skip-seed; yarn playwright show-report"
   },
   "dependencies": {
+    "@keyv/redis": "^5.1.4",
     "@nestjs/axios": "^4.0.1",
+    "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
@@ -31,10 +33,13 @@
     "@prisma/client": "^6.16.2",
     "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
+    "cache-manager": "^7.2.5",
+    "cacheable": "^2.3.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.7",
     "helmet": "^8.1.0",
+    "keyv": "^5.5.4",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",

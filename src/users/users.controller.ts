@@ -8,6 +8,7 @@ import {
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { plainToInstance } from 'class-transformer';
@@ -21,6 +22,7 @@ import { ReviewsService } from 'src/reviews/reviews.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ReviewDto } from 'src/common/dto/review.dto';
 import { ApiResponse } from 'src/common/interfaces/api-response.interface';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('users')
 export class UsersController {
@@ -29,6 +31,8 @@ export class UsersController {
     private readonly reviewsService: ReviewsService,
   ) {}
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000)
   @Get('/:username')
   async getUserByUsername(
     @Param('username') username: string,

@@ -1,7 +1,16 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  UseInterceptors,
+} from '@nestjs/common';
 import { TmdbService } from './tmdb.service';
 import { Credits } from '../common/interfaces/tmdb.interfaces';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
+@UseInterceptors(CacheInterceptor)
+@CacheTTL(60000)
 @Controller('tmdb')
 export class TmdbController {
   constructor(private readonly tmdbService: TmdbService) {}

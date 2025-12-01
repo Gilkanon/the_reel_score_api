@@ -4,13 +4,17 @@ import {
   Get,
   ParseIntPipe,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TmdbService } from 'src/tmdb/tmdb.service';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('media')
 export class MediaController {
   constructor(private readonly tmdbService: TmdbService) {}
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(3600000)
   @Get('/trending')
   async getTrendingMedia() {
     const [movies, tvShows] = await Promise.all([
@@ -24,6 +28,8 @@ export class MediaController {
     };
   }
 
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60000)
   @Get('/search')
   async search(
     @Query('query') query: string,

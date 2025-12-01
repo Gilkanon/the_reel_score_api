@@ -1,4 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Query,
+  UseInterceptors,
+} from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ReviewDto } from 'src/common/dto/review.dto';
@@ -6,7 +13,10 @@ import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 import { TvShowDetails } from 'src/common/interfaces/tmdb.interfaces';
 import { ReviewsService } from 'src/reviews/reviews.service';
 import { TmdbService } from 'src/tmdb/tmdb.service';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
+@UseInterceptors(CacheInterceptor)
+@CacheTTL(60000)
 @Controller('tv')
 export class TvController {
   constructor(

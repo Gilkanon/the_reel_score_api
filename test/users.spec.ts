@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+// Helper function to add delays between requests to respect throttler limits
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 test.describe('Users API', () => {
   let regularUserToken: string;
   let adminUserToken: string;
@@ -9,6 +12,7 @@ test.describe('Users API', () => {
   test.beforeAll(async ({ request }) => {
     // Use admin user from seed.ts
     // Username: 'admin', Password: 'adminPassword'
+    // Note: Auth throttler limit is 3 requests per 60 seconds
     adminUsername = 'admin';
     const adminLoginResponse = await request.post('auth/login', {
       data: {
@@ -19,6 +23,9 @@ test.describe('Users API', () => {
     expect(adminLoginResponse.ok()).toBeTruthy();
     const adminLoginBody = await adminLoginResponse.json();
     adminUserToken = adminLoginBody.accessToken;
+
+    // Wait to respect auth throttler limit (3 requests per 60 seconds)
+    await delay(25000);
 
     // Use regular user from seed.ts
     // Username: 'user', Password: 'userPassword'
@@ -82,6 +89,9 @@ test.describe('Users API', () => {
       };
 
       await request.post('auth/register', { data: userData });
+
+      // Small delay to avoid throttler issues
+      await delay(500);
 
       const response = await request.get(`users/${newUsername}`);
       expect(response.ok()).toBeTruthy();

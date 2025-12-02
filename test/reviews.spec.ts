@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+// Helper function to add delays between requests to respect throttler limits
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 test.describe('Reviews API', () => {
   let userToken: string;
   let secondUserToken: string;
@@ -10,6 +13,7 @@ test.describe('Reviews API', () => {
 
   test.beforeAll(async ({ request }) => {
     // Create first test user
+    // Note: Auth throttler limit is 3 requests per 60 seconds
     const uniqueId = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
     testUsername = `review_user_${uniqueId}`;
     const userData = {
@@ -23,7 +27,10 @@ test.describe('Reviews API', () => {
     });
     expect(registerResponse.ok()).toBeTruthy();
     const registerBody = await registerResponse.json();
-    userToken = registerBody.accessToken;
+    userToken = registerBody.tokens.accessToken;
+
+    // Wait to respect auth throttler limit (3 requests per 60 seconds)
+    await delay(25000); // Wait 25 seconds between auth requests
 
     // Create second test user
     const secondUniqueId = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -39,7 +46,7 @@ test.describe('Reviews API', () => {
     });
     expect(secondRegisterResponse.ok()).toBeTruthy();
     const secondRegisterBody = await secondRegisterResponse.json();
-    secondUserToken = secondRegisterBody.accessToken;
+    secondUserToken = secondRegisterBody.tokens.accessToken;
 
     // Use known TMDB movie ID for tests (e.g., popular movie)
     testMediaId = 550; // Fight Club
@@ -218,6 +225,9 @@ test.describe('Reviews API', () => {
       });
       expect(firstResponse.ok()).toBeTruthy();
 
+      // Small delay to avoid throttler issues
+      await delay(500);
+
       // Try to create second review for the same media
       const secondResponse = await request.post('reviews/create', {
         headers: {
@@ -250,6 +260,9 @@ test.describe('Reviews API', () => {
       expect(createResponse.ok()).toBeTruthy();
       const createBody = await createResponse.json();
       const reviewId = createBody.review.id;
+
+      // Small delay to avoid throttler issues
+      await delay(500);
 
       // Update rating
       const updateResponse = await request.patch(`reviews/${reviewId}`, {
@@ -285,6 +298,9 @@ test.describe('Reviews API', () => {
       const createBody = await createResponse.json();
       const reviewId = createBody.review.id;
 
+      // Small delay to avoid throttler issues
+      await delay(500);
+
       const updateResponse = await request.patch(`reviews/${reviewId}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -317,6 +333,9 @@ test.describe('Reviews API', () => {
       expect(createResponse.ok()).toBeTruthy();
       const createBody = await createResponse.json();
       const reviewId = createBody.review.id;
+
+      // Small delay to avoid throttler issues
+      await delay(500);
 
       const updateResponse = await request.patch(`reviews/${reviewId}`, {
         headers: {
@@ -366,6 +385,9 @@ test.describe('Reviews API', () => {
       expect(createResponse.ok()).toBeTruthy();
       const createBody = await createResponse.json();
       const reviewId = createBody.review.id;
+
+      // Small delay to avoid throttler issues
+      await delay(500);
 
       // Try to update review from second user
       const updateResponse = await request.patch(`reviews/${reviewId}`, {
@@ -434,6 +456,9 @@ test.describe('Reviews API', () => {
       const createBody = await createResponse.json();
       const reviewId = createBody.review.id;
 
+      // Small delay to avoid throttler issues
+      await delay(500);
+
       // Delete review
       const deleteResponse = await request.delete(`reviews/${reviewId}`, {
         headers: {
@@ -442,6 +467,9 @@ test.describe('Reviews API', () => {
       });
 
       expect(deleteResponse.ok()).toBeTruthy();
+
+      // Small delay to avoid throttler issues
+      await delay(500);
 
       // Verify that review is actually deleted
       const getResponse = await request.patch(`reviews/${reviewId}`, {
@@ -488,6 +516,9 @@ test.describe('Reviews API', () => {
       expect(createResponse.ok()).toBeTruthy();
       const createBody = await createResponse.json();
       const reviewId = createBody.review.id;
+
+      // Small delay to avoid throttler issues
+      await delay(500);
 
       // Try to delete review from second user
       const deleteResponse = await request.delete(`reviews/${reviewId}`, {

@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   Post,
+  Query,
   Req,
   Res,
   UnauthorizedException,
@@ -14,7 +15,9 @@ import { plainToInstance } from 'class-transformer';
 import { TokenDto } from './dto/token.dto';
 import type { Request, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { seconds, Throttle } from '@nestjs/throttler';
 
+@Throttle({ auth: { limit: 3, ttl: seconds(60) } })
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -46,7 +49,13 @@ export class AuthController {
   ) {
     const tokens = await this.authService.register(registerDto);
     this.setRefreshTokenCookie(res, tokens.refreshToken);
-    return plainToInstance(TokenDto, tokens);
+    return {
+      tokens: plainToInstance(TokenDto, tokens),
+      message:
+        'To complete the registration, please verify your email address.\n' +
+        'A verification email has been sent to your inbox; follow the instructions provided in the email.\n' +
+        'If you do not verify your email within 24 hours, your account will be deleted!',
+    };
   }
 
   @Post('login')
@@ -68,12 +77,20 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refreshTokens(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async refreshTokens(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const refreshToken = this.extractRefreshTokenFromCookie(req);
 
     const tokens = await this.authService.refreshToken(refreshToken);
 
     this.setRefreshTokenCookie(res, tokens.refreshToken);
     return plainToInstance(TokenDto, tokens);
+  }
+
+  @Post('verify')
+  async emailVerification(@Query('token') token: string) {
+    return this.authService.emailVerification(token);
   }
 }

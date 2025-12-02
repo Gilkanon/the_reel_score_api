@@ -57,7 +57,10 @@ test.describe('TV Shows API', () => {
       });
       expect(registerResponse.ok()).toBeTruthy();
       const registerBody = await registerResponse.json();
-      const token = registerBody.accessToken;
+      const token = registerBody.tokens.accessToken;
+
+      // Small delay to avoid throttler issues
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Create a review
       const reviewData = {

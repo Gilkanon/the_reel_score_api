@@ -8,7 +8,9 @@ import {
 } from '@nestjs/common';
 import { TmdbService } from 'src/tmdb/tmdb.service';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { seconds, Throttle } from '@nestjs/throttler';
 
+@Throttle({ media: { limit: 30, ttl: seconds(60) } })
 @Controller('media')
 export class MediaController {
   constructor(private readonly tmdbService: TmdbService) {}

@@ -8,7 +8,9 @@ import {
 import { TmdbService } from './tmdb.service';
 import { Credits } from '../common/interfaces/tmdb.interfaces';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { seconds, Throttle } from '@nestjs/throttler';
 
+@Throttle({ tmdb: { limit: 30, ttl: seconds(60) } })
 @UseInterceptors(CacheInterceptor)
 @CacheTTL(60000)
 @Controller('tmdb')

@@ -19,7 +19,7 @@ This project is being developed as a comprehensive learning exercise to master f
 - **Framework:** [NestJS](https://nestjs.com/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
 - **ORM:** [Prisma](https://www.prisma.io/)
-- **Database:** [MySQL](https://www.mysql.com/)
+- **Database:** [PostgreSQL]((https://www.postgresql.org/))
 - **Authentication:** [Passport.js](http://www.passportjs.org/) (with `passport-jwt`)
 - **Validation:** [class-validator](https://github.com/typestack/class-validator) & [class-transformer](https://github.com/typestack/class-transformer)
 
@@ -75,8 +75,8 @@ This API is built using a hybrid BFF and RESTful approach.
 ### 1. Prerequisites
 
 - Node.js (v18 or higher recommended)
-- npm or yarn
-- A running MySQL database
+- Yarn
+- A running docker on your PC
 - A TMDb API Key (get one [here](https://www.themoviedb.org/documentation/api))
 
 ### 2. Installation & Setup
@@ -91,15 +91,21 @@ This API is built using a hybrid BFF and RESTful approach.
 2.  **Install dependencies:**
 
     ```bash
-    npm install
+    yarn install
     ```
 
 3.  **Set up environment variables:**
     Create a `.env` file in the root of the project and add the following variables:
 
     ```env
+    # Environment
+    NODE_ENV=development or production
+    
     # Database
-    DATABASE_URL="mysql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
+    DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE_NAME"
+    POSGRES_USER="your username to log in postgres"
+    POSTGRES_DB="db name"
+    POSTGRES_PASSWORD="your password to log in postgres"
 
     # JWT
     JWT_SECRET="your-strong-access-secret"
@@ -110,19 +116,25 @@ This API is built using a hybrid BFF and RESTful approach.
 
     # Bcrypt
     SALT="salt-rounds"
+
+    # Caching
+    REDIS_HOST="your redis container name"
+    REDIS_PORT="your redis port as default 6379"
+
+    # pgAdmin
+    PGADMIN_EMAIL="your email to log in pgAdmin"
+    PGADMIN_PASSWORD="your password to log in pgAdmin"
     ```
 
-4.  **Run database migrations:**
-    This will sync your Prisma schema with your MySQL database.
+4.  **Run docker-compose**
+    This will create a network and containers for your project via docker
 
     ```bash
-    npx prisma migrate dev
+    docker-compose up --build
     ```
 
-5.  **Start the development server:**
-    ```bash
-    npm run start:dev
-    ```
+    After building and starting all images, the Prisma schema migration to the PostgreSQL database will be automatically executed. Subsequently, the application will launch     in development mode, and end-to-end (e2e) tests will run; upon completion, the test results report will open automatically.
+
     The server will be running on `http://localhost:3000`.
 
 ## 🧪 Testing

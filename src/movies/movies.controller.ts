@@ -14,7 +14,9 @@ import { MovieDetails } from 'src/common/interfaces/tmdb.interfaces';
 import { ReviewsService } from 'src/reviews/reviews.service';
 import { TmdbService } from 'src/tmdb/tmdb.service';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { seconds, Throttle } from '@nestjs/throttler';
 
+@Throttle({ movie: { limit: 30, ttl: seconds(60) } })
 @UseInterceptors(CacheInterceptor)
 @CacheTTL(60000)
 @Controller('movies')

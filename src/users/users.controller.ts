@@ -59,7 +59,10 @@ export class UsersController {
   async updateOwnUserData(@Body() updateUserDto: UpdateUserDto, @Req() req) {
     const { username } = req.user;
 
-    const user = await this.usersService.updateUser(username, updateUserDto);
+    const user = await this.usersService.updateUserByUsername(
+      username,
+      updateUserDto,
+    );
 
     return plainToInstance(UserDto, user);
   }
@@ -79,7 +82,10 @@ export class UsersController {
     @Param('username') username: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const user = await this.usersService.updateUser(username, updateUserDto);
+    const user = await this.usersService.updateUserByUsername(
+      username,
+      updateUserDto,
+    );
 
     return plainToInstance(UserDto, user);
   }

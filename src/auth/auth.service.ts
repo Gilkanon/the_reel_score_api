@@ -1,6 +1,8 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -12,6 +14,12 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
+import { v4 as uuidv4 } from 'uuid';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -19,33 +27,48 @@ export class AuthService {
     private usersService: UsersService,
     private prisma: PrismaService,
     private jwtService: JwtService,
+    @InjectQueue('mail-queue') private mailQueue: Queue,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async register(registerDto: RegisterDto) {
     const { email, username, password } = registerDto;
 
-    const existingUser = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { username }],
-      },
-    });
+    try {
+      const user = await this.usersService.createUser({
+        username,
+        email,
+        password,
+      });
 
-    if (existingUser) {
-      if (existingUser.email === email) {
-        throw new ConflictException('User with this email already exist');
-      }
-      if (existingUser.username === username) {
-        throw new ConflictException('User with this username already exist');
+      const token = uuidv4();
+
+      await this.cacheManager.set(`verify:${token}`, user.id, 86400 * 1000);
+
+      await this.mailQueue.add('confirmation', {
+        email: user.email,
+        name: user.username,
+        token: token,
+      });
+
+      return this.login({ username: user.username, password: password });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          const target = error.meta?.target as string[];
+
+          if (target.includes('email')) {
+            throw new ConflictException('Email already exists');
+          }
+          if (target.includes('username')) {
+            throw new ConflictException('Username already exists');
+          }
+          throw new ConflictException('Account already exists');
+        }
       }
     }
 
-    const user = await this.usersService.createUser({
-      username,
-      email,
-      password,
-    });
-
-    return this.login({ username: user.username, password: password });
+    throw new InternalServerErrorException('Failed to register user');
   }
 
   async login(loginDto: LoginDto): Promise<TokenDto> {
@@ -127,5 +150,25 @@ export class AuthService {
     if (count === 0) {
       throw new UnauthorizedException('Invalid refresh token');
     }
+  }
+
+  async emailVerification(token: string) {
+    const userId = await this.cacheManager.get(`verify:${token}`);
+
+    if (!userId) {
+      throw new NotFoundException('Invalid token');
+    }
+
+    const user = await this.usersService.updateUserValidation(String(userId));
+
+    if (!user) {
+      throw new NotFoundException('Invalid token');
+    }
+
+    await this.cacheManager.del(`verify:${token}`);
+
+    return {
+      message: 'Email verified successfully',
+    };
   }
 }

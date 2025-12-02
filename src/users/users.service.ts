@@ -13,8 +13,8 @@ export class UsersService {
   ) {}
 
   getSalt(): string | number {
-    const salt = this.configService.get<string | number>('SALT');
-    return salt ? salt : 10;
+    const salt = this.configService.getOrThrow<string | number>('SALT');
+    return salt;
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -46,7 +46,7 @@ export class UsersService {
     return user;
   }
 
-  async updateUser(username: string, updateUserDto: UpdateUserDto) {
+  async updateUserByUsername(username: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password) {
       const { password } = updateUserDto;
       updateUserDto.password = await this.hashPassword(password);
@@ -55,6 +55,15 @@ export class UsersService {
     const user = await this.prisma.user.update({
       where: { username: username },
       data: updateUserDto,
+    });
+
+    return user;
+  }
+
+  async updateUserValidation(id: string) {
+    const user = await this.prisma.user.update({
+      where: { id: id },
+      data: { verified: true },
     });
 
     return user;

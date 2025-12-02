@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+// Helper function to add delays between requests to respect throttler limits
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 test.describe('User Profile Lifecycle', () => {
   test('Lifecycle: Register -> Update profile username -> Delete profile', async ({
     request,
@@ -18,17 +21,26 @@ test.describe('User Profile Lifecycle', () => {
     expect(registerResponse.ok()).toBeTruthy();
 
     const registerBody = await registerResponse.json();
-    expect(registerBody).toHaveProperty('accessToken');
+    expect(registerBody).toHaveProperty('tokens');
+    expect(registerBody.tokens).toHaveProperty('accessToken');
 
     const headers = registerResponse.headers();
     expect(headers['set-cookie']).toBeDefined();
     expect(headers['set-cookie']).toContain('refreshToken');
+
+    const accessToken = registerBody.tokens.accessToken;
+
+    // Wait to respect auth throttler limit (3 requests per 60 seconds)
+    await delay(25000);
 
     const logoutResponse = await request.post('auth/logout');
 
     expect(logoutResponse.ok()).toBeTruthy();
     const logoutHeaders = logoutResponse.headers();
     expect(logoutHeaders['set-cookie']).toBeDefined();
+
+    // Wait to respect auth throttler limit
+    await delay(25000);
 
     const loginResponse = await request.post('auth/login', {
       data: {
@@ -41,6 +53,9 @@ test.describe('User Profile Lifecycle', () => {
 
     const loginBody = await loginResponse.json();
     expect(loginBody).toHaveProperty('accessToken');
+
+    // Wait to respect auth throttler limit
+    await delay(25000);
 
     const refreshResponse = await request.post('auth/refresh', {
       headers: {
@@ -67,6 +82,9 @@ test.describe('User Profile Lifecycle', () => {
 
     const updateBody = await updateUserResponse.json();
     expect(updateBody).toHaveProperty('username', newUsername);
+
+    // Wait to respect auth throttler limit
+    await delay(25000);
 
     const newUsernameLoginResponse = await request.post('auth/login', {
       data: {

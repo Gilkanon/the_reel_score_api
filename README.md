@@ -19,7 +19,7 @@ This project is being developed as a comprehensive learning exercise to master f
 - **Framework:** [NestJS](https://nestjs.com/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
 - **ORM:** [Prisma](https://www.prisma.io/)
-- **Database:** [PostgreSQL]((https://www.postgresql.org/))
+- **Database:** [PostgreSQL](https://www.postgresql.org/)
 - **Authentication:** [Passport.js](http://www.passportjs.org/) (with `passport-jwt`)
 - **Validation:** [class-validator](https://github.com/typestack/class-validator) & [class-transformer](https://github.com/typestack/class-transformer)
 
